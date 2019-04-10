@@ -7,16 +7,14 @@
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-  
     gtag('config', 'UA-138085015-1');
   </script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>BPM COUNTER</title>
-  <meta name="description" content="曲に合わせてタップすることでBPMの測定を行う事ができます。">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <meta charset="utf-8">
-  <meta name="description" content="">
-  <meta name="author" content="">
+  <meta name="description" content="曲に合わせてタップすることでテンポ（BPM）の測定を行う事ができます。">
+  <meta name="author" content="somakawa">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="">
   <!--[if lt IE 9]>
@@ -24,106 +22,111 @@
   <script src="//cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
   <![endif]-->
   <link rel="shortcut icon" href="">
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
 </head>
 <body>
-<!-- Place your content here -->
-曲に合わせてタップすることでテンポを測る事ができます。<br>
-タップしたすべてのテンポを計測するため、タップすればするほど正確にBPMの測定が可能です。<br>
-現在開発中のためスマホではうまく利用できない可能性があります。<br>
-(lastupdate: 2019-04-10)
-<div id="bpm-disp">
-  bpm = <span id="bpm-text"></span>
-  (count: <span id="count-txt"></span>)
-  <!-- bpm = <span id="bpm-m-text"></span> -->
-</div>
-<button id="tap">TAP</button>
-<button id="reset">RESET</button>
-<div id="logs"></div>
+    <div class="container">
+      <h1>BPM COUNTER</h1>
+      <!-- Place your content here -->
+      曲に合わせてタップすることでテンポを測る事ができます。<br>
+      現在開発中のためスマホではうまく利用できない可能性があります。<br>
+      <span style="color:red;">NOW IN DEVELOPMENT</span><br>
+      (lastupdate: 2019-04-10)
+      <div id="bpm-wrap" class="border border-primary rounded">
+        <span id="bpm">bpm = <span id="bpm-text" class="col-8">####</span></span><br>
+        <span id="count">(count: <span id="count-txt" class="col-4">####</span>)</span>
+      </div>
+      <div id="buttons" class="row">
+        <div class="col-10"><button id="tap" class="control btn btn-primary">TAP</button></div>
+        <div class="col-2"><button id="reset" class="control btn btn-outline-danger">RESET</button></div>
+      </div>
+      <div id="logs"></div>
+    </div>
 <!-- SCRIPTS -->
 <script>
   let cur_taptime;
   let pre_taptime;
-  let diff_time;
   let first_flg = true;
-  let times = [];
+  let log_message;
+  let bpm;
   let bpms = [];
-  let bpm = 0;
-  let audioElem = new Audio();
+  let ave_bpm;
 
-  audioElem.src = "media/click.mp3"
-
-  $('button#tap').on('keydown touchstart',function(){
-    let add_txt;
+  const clkTapButton = (e) => {
+    e.preventDefault();
     cur_taptime = performance.now() / 1000
+
     if (first_flg){
+      ave_bpm = 0
+      log_message = '### START ###';
       pre_taptime = cur_taptime;
       first_flg = false;
-      add_txt = 'START';
     } else {
-      diff_time = cur_taptime - pre_taptime;
-      times.push(diff_time);
-      bpms.push(60.0 / diff_time);
+      bpm = 60 / (cur_taptime - pre_taptime)
+      bpms.push(bpm);
+      ave_bpm = average(bpms);
+      log_message = `BPM = ${bpm}`;
       pre_taptime = cur_taptime;
-      bpm = 60 / average(times);
-      $('span#bpm-text').text(Math.round(bpm * 10) / 10);
-      $('span#count-txt').text(times.length);
-
-      // $('span#bpm-m-text').text(Math.round(median(bpms)));
-      add_txt = `BPM = ${60.0 / diff_time}`;
     }
-    $('div#logs').prepend(`<div>${add_txt}</div>`);
-    // audioElem.play();
-  });
 
-  $('button#reset').on('click', function(){
-    location.reload();
-    // first_flg = true;
-    // times = [];
-    // bpms = [];
-    // bpm = 0;
-    // $('div#logs>div').remove();
-    //   $('span#bpm-text').text('---');
-    //   $('span#count-txt').text('0');
-  });
+    $('span#bpm-text').text(Math.round(ave_bpm * 10) / 10);
+    $('span#count-txt').text(bpms.length);
+    $('div#logs').prepend(`<div>${log_message}</div>`);
+    e.stopPropagation();
+  };
 
-  let average = function(arr, fn) {
+  const average = (arr, fn) => {
     return sum(arr, fn) / arr.length;
   };
 
-  var sum = function(arr, fn) {
+  const sum = (arr, fn) => {
     if (fn) {
-        return sum(arr.map(fn));
-    }
-    else {
-        return arr.reduce(function(prev, current, i, arr) {
-                return prev + current;
-        });
+      return sum(arr.map(fn));
+    } else {
+      return arr.reduce((prev, current, i, arr) => {
+        return prev + current;
+      });
     }
   };
 
-  var median = function(arr, fn) {
-    var half = (arr.length/2)|0;
-    var temp = arr.sort(fn);
-
-    if (temp.length%2) {
-        return temp[half];
-    }
-
-    return Math.round((temp[half-1] + temp[half])/2);
-  };
-
+  $('button#tap').on('touchstart', clkTapButton);
+  $('button#tap').on('mousedown', clkTapButton);
+  $('button#reset').on('click', ()=>{
+    // 全体仕様決まるまでリロードで暫定対応
+    location.reload();
+  });
 </script>
 <style>
-
   html {
     touch-action: manipulation;
   }
-  div#bpm-disp{
+  .container {
+    background-color: #f5f5f5;
+    padding: 10px 20px;
+    max-width: 700px;
+}
+  #bpm-wrap{
+    height: 100px;
+    margin: 20px 0;
+    background-color: white;
+  }
+
+  #bpm{
     font-size: 2em;
   }
   button{
     width: 200px;
     height: 100px;
+    width: 100%;
+  }
+
+  div#logs{
+    margin: 20px 0;
   }
 </style>
 <!-- Example: <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script> -->
