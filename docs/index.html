@@ -51,7 +51,7 @@
 
   audioElem.src = "media/click.mp3"
 
-  $('button#tap').on('click',function(){
+  $('button#tap').on('mousedown keydown tap',function(){
     let add_txt;
     cur_taptime = performance.now() / 1000
     if (first_flg){
@@ -74,7 +74,7 @@
     audioElem.play();
   });
 
-  $('button#reset').on('mousedown', function(){
+  $('button#reset').on('click', function(){
     location.reload();
     // first_flg = true;
     // times = [];
