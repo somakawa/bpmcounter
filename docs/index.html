@@ -15,7 +15,6 @@
 <title>BPM COUNTER</title>
 <meta name="description" content="曲に合わせてタップすることでBPMの測定を行う事ができます。">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <meta charset="utf-8">
 <meta name="description" content="">
 <meta name="author" content="">
@@ -111,6 +110,10 @@
 
 </script>
 <style>
+
+  html {
+    touch-action: manipulation;
+  }
   div#bpm-disp{
     font-size: 2em;
   }
