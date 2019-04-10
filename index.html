@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>BPM COUNTER</title>
+<meta name="description" content="曲に合わせてタップすることでBPMの測定を行う事ができます。">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<meta charset="utf-8">
+<meta name="description" content="">
+<meta name="author" content="">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="">
+<!--[if lt IE 9]>
+<script src="//cdn.jsdelivr.net/html5shiv/3.7.2/html5shiv.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+<link rel="shortcut icon" href="">
+</head>
+<body>
+<!-- Place your content here -->
+曲に合わせてタップすることでテンポを測る事ができます。
+タップしたすべてのテンポを計測するため、タップすればするほど正確にBPMの測定が可能です。
+現在開発中のためスマホではうまく利用できない可能性があります。
+<div id="bpm-disp">
+  bpm = <span id="bpm-text"></span>
+  (count: <span id="count-txt"></span>)
+  <!-- bpm = <span id="bpm-m-text"></span> -->
+</div>
+<button id="tap">TAP</button>
+<button id="reset">RESET</button>
+<div id="logs"></div>
+<!-- SCRIPTS -->
+<script>
+  let cur_taptime;
+  let pre_taptime;
+  let diff_time;
+  let first_flg = true;
+  let times = [];
+  let bpms = [];
+  let bpm = 0;
+
+  $('button#tap').on('click',function(){
+    let add_txt;
+    cur_taptime = performance.now() / 1000
+    if (first_flg){
+      pre_taptime = cur_taptime;
+      first_flg = false;
+      add_txt = 'START';
+    } else {
+      diff_time = cur_taptime - pre_taptime;
+      times.push(diff_time);
+      bpms.push(60.0 / diff_time);
+      pre_taptime = cur_taptime;
+      bpm = 60 / average(times);
+      $('span#bpm-text').text(Math.round(bpm * 10) / 10);
+      $('span#count-txt').text(times.length);
+
+      // $('span#bpm-m-text').text(Math.round(median(bpms)));
+      add_txt = `BPM = ${60.0 / diff_time}`;
+    }
+    $('div#logs').prepend(`<div>${add_txt}</div>`);
+  });
+
+  $('button#reset').on('click', function(){
+    location.reload();
+    // first_flg = true;
+    // times = [];
+    // bpms = [];
+    // bpm = 0;
+    // $('div#logs>div').remove();
+    //   $('span#bpm-text').text('---');
+    //   $('span#count-txt').text('0');
+  });
+
+  let average = function(arr, fn) {
+    return sum(arr, fn) / arr.length;
+  };
+
+  var sum = function(arr, fn) {
+    if (fn) {
+        return sum(arr.map(fn));
+    }
+    else {
+        return arr.reduce(function(prev, current, i, arr) {
+                return prev + current;
+        });
+    }
+  };
+
+  var median = function(arr, fn) {
+    var half = (arr.length/2)|0;
+    var temp = arr.sort(fn);
+
+    if (temp.length%2) {
+        return temp[half];
+    }
+
+    return Math.round((temp[half-1] + temp[half])/2);
+  };
+
+</script>
+<style>
+  div#bpm-disp{
+    font-size: 2em;
+  }
+  button{
+    width: 200px;
+    height: 100px;
+  }
+</style>
+<!-- Example: <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script> -->
+</body>
+</html>
