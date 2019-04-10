@@ -33,17 +33,19 @@
     <div class="container">
       <h1>BPM COUNTER</h1>
       <!-- Place your content here -->
-      曲に合わせてタップしてテンポを測る事ができます。<br>
+      曲に合わせてタップしてテンポを測れます。<br>
+      全タップの平均BPMを出すのでタップするほど正確になります。<br>
+      <span style="font-size: 7px">
       現在開発中のためうまく利用できない可能性があります。<br>
       <span style="color:red;">NOW IN DEVELOPMENT</span><br>
-      (lastupdate: 2019-04-11)
+      (lastupdate: 2019-04-11)</span>
       <div id="bpm-wrap" class="border border-primary rounded">
         <span id="bpm">bpm = <span id="bpm-text" class="col-8">####</span></span><br>
         <span id="count">(count: <span id="count-txt" class="col-4">####</span>)</span>
       </div>
       <div id="buttons" class="row">
-        <div class="col-10"><button id="tap" class="control btn btn-primary">TAP</button></div>
-        <div class="col-2"><button id="reset" class="control btn btn-outline-danger">C</button></div>
+        <div class="col-8"><button id="tap" class="control btn btn-primary">TAP</button></div>
+        <div class="col-4"><button id="reset" class="control btn btn-outline-danger">C</button></div>
       </div>
       <div id="logs"></div>
     </div>
