@@ -51,7 +51,7 @@
 
   audioElem.src = "media/click.mp3"
 
-  $('button#tap').on('mousedown keydown tap',function(){
+  $('button#tap').on('mousedown keydown touchstart',function(){
     let add_txt;
     cur_taptime = performance.now() / 1000
     if (first_flg){
