@@ -56,7 +56,7 @@
   let bpms = [];
   let ave_bpm;
 
-  const clkTapButton = (e) => {
+  const clkTapButton = e => {
     e.preventDefault();
     cur_taptime = performance.now() / 1000
 
@@ -95,10 +95,7 @@
 
   $('button#tap').on('touchstart', clkTapButton);
   $('button#tap').on('mousedown', clkTapButton);
-  $('button#reset').on('click', ()=>{
-    // 全体仕様決まるまでリロードで暫定対応
-    location.reload();
-  });
+  $('button#reset').on('click', e => location.reload());
 </script>
 <style>
   html {
