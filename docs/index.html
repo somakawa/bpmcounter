@@ -34,9 +34,11 @@
     <div class="container">
       <h1>わかりまてんぽくん</h1>
       <!-- Place your content here -->
-      曲に合わせてタップしてテンポを測れます。<br>
-      全タップの平均BPMを算出します。<br>
-      テンポ感がなくてもたくさんタップすると正確な値になります。
+      <div id="desc">
+        曲に合わせてタップしてテンポを測れます。<br>
+        全タップの平均BPMを算出します。<br>
+        テンポ感がなくてもたくさんタップすると正確な値になります。
+      </div>
       <div id="bpm-wrap" class="border border-primary rounded">
         <span id="bpm">bpm = <span id="bpm-text" class="col-8">####</span></span><br>
         <span id="count">(count: <span id="count-txt" class="col-4">####</span>)</span>
@@ -102,11 +104,18 @@
   html {
     touch-action: manipulation;
   }
+  h1 {
+    font-size: 1.6rem;
+  }
   .container {
     background-color: #f5f5f5;
     padding: 10px 20px;
     max-width: 700px;
-}
+  }
+
+  div#desc {
+      font-size: 0.8em;
+  }
   #bpm-wrap{
     height: 100px;
     margin: 20px 0;
