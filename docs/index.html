@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <!-- Global site tag (gtag.js) - Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=UA-138085015-1"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
+    function gtag() { dataLayer.push(arguments); }
     gtag('js', new Date());
     gtag('config', 'UA-138085015-1');
   </script>
@@ -43,119 +44,142 @@
   <script src="//cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
   <![endif]-->
   <link rel="shortcut icon" href="">
-  <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <!-- Bootstrap CSS -->
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+    integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 </head>
 <body>
-    <div class="container">
-      <h1>わかりまテンポくんβ</h1>
-      <!-- Place your content here -->
-      <div id="desc">
-        曲に合わせてタップしてテンポを測れます。<br>
-        全タップの平均BPMを算出します。<br>
-        リズム感がなくてもたくさんタップすると正確な値になります。
-        author: <a href="https://twitter.com/somacentime">@somacentime</a>
-      </div>
-      <div id="bpm-wrap" class="border border-primary rounded">
-        <span id="bpm">bpm = <span id="bpm-text" class="col-8">####</span></span><br>
-        <span id="count">(count: <span id="count-txt" class="col-4">####</span>)</span>
-      </div>
-      <div id="buttons" class="row">
-        <div class="col-8"><button id="tap" class="control btn btn-primary">TAP</button></div>
-        <div class="col-4"><button id="reset" class="control btn btn-outline-danger">C</button></div>
-      </div>
-      <div id="logs"></div>
+  <div class="container">
+    <h1>わかりまテンポくん</h1>
+    <div id="desc">
+      曲に合わせてタップしてテンポを測れます。<br>
+      全タップの平均BPMを算出します。<br>
+      リズム感がなくてもたくさんタップすると正確な値になります。
+      author: <a href="https://twitter.com/somacentime">@somacentime</a><br>
+      スペース/エンターキーでタップ<br>
+      C/Escキーでリセットできます。
     </div>
-<!-- SCRIPTS -->
-<script>
-  let cur_taptime;
-  let pre_taptime;
-  let first_flg = true;
-  let log_message;
-  let bpm;
-  let bpms = [];
-  let ave_bpm;
+    <div id="bpm-wrap" class="border border-primary rounded">
+      <span id="bpm">bpm = <span id="bpm-text" class="col-8">####</span></span><br>
+      <span id="count">(count: <span id="count-txt" class="col-4">####</span>)</span>
+    </div>
+    <div id="buttons" class="row">
+      <div class="col-8"><button id="tap" class="control btn btn-primary">TAP</button></div>
+      <div class="col-4"><button id="reset" class="control btn btn-outline-danger">C</button></div>
+    </div>
+    <div id="logs"></div>
+    <div id="history">
+      <p>--HISTORY--</p>
+      <p>2022.05.06: キーボード入力に対応</p>
+      <p>2019.04.10: リリース</p>
+    </div>
+  </div>
+  <script>
+    let cur_taptime;
+    let pre_taptime;
+    let first_flg = true;
+    let log_message;
+    let bpm;
+    let bpms = [];
+    let ave_bpm;
 
-  const clkTapButton = e => {
-    e.preventDefault();
-    cur_taptime = performance.now() / 1000
+    const clkTapButton = e => {
+      e.preventDefault();
+      cur_taptime = performance.now() / 1000
 
-    if (first_flg){
-      ave_bpm = 0
-      log_message = '### START ###';
-      pre_taptime = cur_taptime;
-      first_flg = false;
-    } else {
-      bpm = 60 / (cur_taptime - pre_taptime)
-      bpms.push(bpm);
-      ave_bpm = average(bpms);
-      log_message = `BPM = ${bpm}`;
-      pre_taptime = cur_taptime;
+      if (first_flg) {
+        ave_bpm = 0
+        log_message = '### START ###';
+        pre_taptime = cur_taptime;
+        first_flg = false;
+      } else {
+        bpm = 60 / (cur_taptime - pre_taptime)
+        bpms.push(bpm);
+        ave_bpm = average(bpms);
+        log_message = `BPM = ${bpm}`;
+        pre_taptime = cur_taptime;
+      }
+
+      $('span#bpm-text').text(Math.round(ave_bpm * 10) / 10);
+      $('span#count-txt').text(bpms.length);
+      $('div#logs').prepend(`<div>${log_message}</div>`);
+      e.stopPropagation();
+    };
+
+    const average = (arr, fn) => {
+      return sum(arr, fn) / arr.length;
+    };
+
+    const sum = (arr, fn) => {
+      if (fn) {
+        return sum(arr.map(fn));
+      } else {
+        return arr.reduce((prev, current, i, arr) => {
+          return prev + current;
+        });
+      }
+    };
+
+    $(window).keydown(function (e) {
+      if ([32,13].includes(e.keyCode)) {
+        clkTapButton(e); 
+      }
+
+      if ([27,67].includes(e.keyCode)) {
+        location.reload();
+      }
+      
+    });
+
+    $('button#tap').on('touchstart', clkTapButton);
+    $('button#tap').on('mousedown', clkTapButton);
+    $('button#reset').on('click', e => location.reload());
+  </script>
+  <style>
+    html {
+      touch-action: manipulation;
     }
 
-    $('span#bpm-text').text(Math.round(ave_bpm * 10) / 10);
-    $('span#count-txt').text(bpms.length);
-    $('div#logs').prepend(`<div>${log_message}</div>`);
-    e.stopPropagation();
-  };
-
-  const average = (arr, fn) => {
-    return sum(arr, fn) / arr.length;
-  };
-
-  const sum = (arr, fn) => {
-    if (fn) {
-      return sum(arr.map(fn));
-    } else {
-      return arr.reduce((prev, current, i, arr) => {
-        return prev + current;
-      });
+    h1 {
+      font-size: 1.6rem;
     }
-  };
 
-  $('button#tap').on('touchstart', clkTapButton);
-  $('button#tap').on('mousedown', clkTapButton);
-  $('button#reset').on('click', e => location.reload());
-</script>
-<style>
-  html {
-    touch-action: manipulation;
-  }
-  h1 {
-    font-size: 1.6rem;
-  }
-  .container {
-    background-color: #f5f5f5;
-    padding: 10px 20px;
-    max-width: 700px;
-  }
+    .container {
+      background-color: #f5f5f5;
+      padding: 10px 20px;
+      max-width: 700px;
+    }
 
-  div#desc {
+    div#desc {
       font-size: 0.8em;
-  }
-  #bpm-wrap{
-    height: 100px;
-    margin: 20px 0;
-    background-color: white;
-  }
+    }
 
-  #bpm{
-    font-size: 2em;
-  }
-  button{
-    width: 200px;
-    height: 100px;
-    width: 100%;
-  }
+    #bpm-wrap {
+      height: 100px;
+      margin: 20px 0;
+      background-color: white;
+    }
 
-  div#logs{
-    margin: 20px 0;
-  }
-</style>
-<!-- Example: <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script> -->
+    #bpm {
+      font-size: 2em;
+    }
+
+    button {
+      width: 200px;
+      height: 100px;
+      width: 100%;
+    }
+
+    div#logs {
+      margin: 20px 0;
+    }
+
+    div#history>p{
+      margin: 0;
+      padding: 0;
+    }
+  </style>
 </body>
+
 </html>
