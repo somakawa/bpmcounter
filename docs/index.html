@@ -1,8 +1,213 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 
 <head>
-  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <meta charset="utf-8">
+  <meta name="robots" content="index, follow">
+  <meta name="googlebot" content="index, follow">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <title>わかりまテンポくん | 絶対測れるBPM測定ツール</title>
+  <meta name="author" content="somakawa">
+  <meta name="keywords" content="BPM,測定,計測,テンポ">
+  <meta name="description" content="リズム感が無くても曲に合わせてタップすると正確にテンポ（BPM）の測定が行えます。">
+  <meta name="copyright" content="Copyright &copy; わかりまテンポくん All right reserved.">
+  <link rel="canonical" href="https://bpm.somakawa.com">
+
+  <!-- Alternate language links -->
+  <link rel="alternate" hreflang="en" href="https://bpm.somakawa.com/en/">
+  <link rel="alternate" hreflang="ja" href="https://bpm.somakawa.com">
+
+  <!-- Apple Touch Icon / Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="./media/favicons/apple-touch-icon-180x180.png">
+  <link rel="icon" sizes="192x192" href="./media/favicons/icon-192x192.png">
+
+  <!-- Social Meta Tags -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="わかりまテンポくん">
+  <meta name="twitter:description" content="絶対測れるBPM測定ツール">
+  <meta name="twitter:image" content="https://bpm.somakawa.com/media/card.jpg">
+  <meta name="twitter:url" content="https://bpm.somakawa.com">
+  <meta property="og:url" content="https://bpm.somakawa.com">
+  <meta property="og:title" content="わかりまテンポくん">
+  <meta property="og:description" content="絶対測れるBPM測定ツール">
+  <meta property="og:image" content="https://bpm.somakawa.com/media/card.jpg">
+  <meta property="og:site_name" content="わかりまテンポくん">
+  <meta property="og:locale" content="ja_JP">
+  <meta property="og:locale:alternate" content="en_US">
+  <meta property="og:type" content="website">
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "url": "https://bpm.somakawa.com/",
+    "name": "わかりまテンポくん",
+    "alternateName": "Tempo-kun",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://bpm.somakawa.com/search?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,700&display=swap" rel="stylesheet">
+
+  <!-- CSS (Bootstrap利用・独自スタイル) -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+    integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <link rel="stylesheet" href="src/style.css">
+
+  <style>
+    /* 基本フォント設定 */
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #ece9e6, #ffffff);
+      color: #333;
+    }
+
+    html {
+      touch-action: manipulation;
+    }
+
+    /* コンテナ */
+    .container {
+      background-color: #fff;
+      padding: 30px 40px;
+      max-width: 700px;
+      margin: 40px auto;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    /* ヘッダー */
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-top: 20px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    /* 説明文 */
+    #desc {
+      font-size: 1rem;
+      margin-bottom: 20px;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    /* BPM表示エリア */
+    #bpm-wrap {
+      background: linear-gradient(135deg, #f6f9fc, #e9eff5);
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    #bpm {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    /* BPM表示エリアの「BPM =」の文字を小さくする */
+    #bpm .label {
+      font-size: 1.5rem;
+    }
+
+    /* ラベル部分の最小幅 */
+    .label {
+      display: inline-block;
+      min-width: 80px;
+    }
+
+    /* ボタン */
+    button.control {
+      height: 100px;
+      width: 100%;
+      font-size: 1.5rem;
+      transition: background-color 0.3s, transform 0.2s;
+    }
+
+    button.control:hover {
+      transform: translateY(-3px);
+    }
+
+    /* トップバーをFlexboxで左右に分ける */
+    #topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    /* 言語切替部分 */
+    #lang_choice {
+      text-align: left;
+    }
+
+    #lang_choice button {
+      margin-right: 5px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: #555;
+      transition: color 0.3s;
+    }
+
+    #lang_choice button:hover,
+    #lang_choice button.active {
+      color: #007bff;
+      text-decoration: underline;
+    }
+
+    /* お問い合わせリンク */
+    #contact_link {
+      text-align: right;
+    }
+
+    #contact_link a {
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: #555;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    #contact_link a:hover {
+      color: #007bff;
+      text-decoration: underline;
+    }
+
+    /* ログ・履歴 */
+    #logs {
+      margin: 20px 0;
+      max-height: 300px;
+      overflow-y: auto;
+      background-color: #f9f9f9;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    #history p {
+      margin: 0;
+      padding: 0;
+      font-size: 0.85rem;
+      color: #777;
+    }
+  </style>
+
+  <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=UA-138085015-1"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -10,116 +215,199 @@
     gtag('js', new Date());
     gtag('config', 'UA-138085015-1');
   </script>
-
-  <!--[if lt IE 9]>
-  <script src="//cdn.jsdelivr.net/html5shiv/3.7.2/html5shiv.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
-  <![endif]-->
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
-    integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-  <link rel="stylesheet" href="src/style.css">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta charset="utf-8">
-  <meta name="author" content="somakawa">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="apple-touch-icon" type="image/png" href="./media/favicons/apple-touch-icon-180x180.png">
-  <link rel="icon" type="image/png" href="./media/favicons/icon-192x192.png">
-
-  <!-- TWITTER -->
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:image" content="https://bpm.somakawa.com/media/card.jpg">
-  <meta name="twitter:url" content="https://bpm.somakawa.com">
-  <meta name="twitter:site" content="@somacentime">
-  <meta name="twitter:domain" content="bpm.somakawa.com">
-
-  <!-- CARD -->
-  <meta property="og:url" content="https://bpm.somakawa.com">
-  <meta property="og:image" content="https://bpm.somakawa.com/media/card.jpg">
-  
-  <!-- 言語設定 -->
-  <title>わかりまテンポくん | 絶対測れるBPM測定ツール</title>
-  <link rel="alternate" hreflang="en" href="https://bpm.somakawa.com/en/" />
-  <link rel="alternate" hreflang="ja" href="https://bpm.somakawa.com" />
-  <meta name="keywords" content="BPM,測定,計測,テンポ">
-  <meta name="description" content="リズム感が無くても曲に合わせてタップすると正確にテンポ（BPM）の測定を行う事ができます。">
-  <meta name="apple-mobile-web-app-title" content="テンポくん" />
-  <meta name="twitter:title" content="わかりまテンポくん">
-  <meta name="twitter:description" content="絶対測れるBPM測定ツール">
-  <meta property="og:title" content="わかりまテンポくん">
-  <meta property="og:site_name" content="わかりまテンポくん">
-  <meta property="og:description" content="絶対測れるBPM測定ツール">
-  <meta name="copyright" content="Copyright &amp;copy; わかりまテンポくん All right reserved.">
-  <meta property="og:locale" content="ja_JP">
 </head>
 
 <body>
-  <div class="container pt-0">
-    <div id="contact" class="text-right small">
-      <a href="https://docs.google.com/forms/d/e/1FAIpQLSf0bi78D6XIxtSpo8U2mfEhfWpcOxBuyU3Fg17WkV3pqp7Y3A/viewform?usp=sf_link">お問い合わせ</a>
-    </div>
-    <div id="lang_choice" class="text-right small">
-      language:
-      <a href="/"><span id="lang_jp">日本語</span></a>
-      <a href="/en/"><span id="lang_en">English</span></a>
-    </div>
-    <h1>わかりまテンポくん</h1>
-    <!--
-    <div id="iten" class="small">
-      2023年3月中にサイトが以下のサイトへ移転します。<br/>計算方法を見直し、これまでよりも高い精度でBPMが測定ができるようになりました。<br/>移転後は当ページは利用できなくなるため、新しいサイトをブックマーク登録していただくようお願いいたします。<br/>ご要望、不具合報告などありましたら<a href="https://docs.google.com/forms/d/e/1FAIpQLSf0bi78D6XIxtSpo8U2mfEhfWpcOxBuyU3Fg17WkV3pqp7Y3A/viewform?usp=sf_link">お問い合わせフォーム</a>よりご連絡いただけますと大変ありがたいです。<br/>移転後サイト(試験稼働中)→<a href="https://somakawa.com/bpm">https://somakawa.com/bpm</a>
-    </div>
--->
-    <div id="desc">
-      曲に合わせてタップしてテンポを測れます。<br>
-      全タップの平均BPMを算出します。<br>
-      リズム感がなくてもたくさんタップすると正確な値になります。<br>
-      [Space]: タップ<br>
-      [C]: リセット
-    </div>
-    <div id="bpm-wrap" class="border border-primary rounded">
-      <span id="bpm">bpm = <span id="bpm-text" class="col-8"></span></span><br>
-      <span id="count">(count: <span id="count-txt" class="col-4"></span>)</span>
-    </div>
-    <div id="buttons" class="row">
-      <div class="col-8"><button id="tap" class="control btn btn-primary">TAP</button></div>
-      <div class="col-4"><button id="reset" class="control btn btn-outline-danger">C</button></div>
-    </div>
-    <div id="logs"></div>
-    <div id="history">
-      <p>--HISTORY--</p>
-      <!--<p>2023.01.29: サイト移転告知追加</p>-->
-      <p>2022.05.06: キーボード入力に対応|トラックパッドだとクリック難しいので</p>
-      <p>2019.04.10: リリース</p>
-    </div>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1162815414473198"
-     crossorigin="anonymous"></script>
-    <!-- 横長広告 -->
-    <ins class="adsbygoogle"
-         style="display:block"
-         data-ad-client="ca-pub-1162815414473198"
-         data-ad-slot="4879657166"
-         data-ad-format="auto"
-         data-full-width-responsive="true"></ins>
-    <script>
-         (adsbygoogle = window.adsbygoogle || []).push({});
-    </script>
-<!--     <iframe sandbox="allow-popups allow-scripts allow-modals allow-forms allow-same-origin" style="width:120px;height:240px;" marginwidth="0" marginheight="0" scrolling="no" frameborder="0" src="//rcm-fe.amazon-adsystem.com/e/cm?lt1=_blank&bc1=FFFFFF&IS2=1&bg1=FFFFFF&fc1=000000&lc1=0000FF&t=bombshell034-22&language=ja_JP&o=9&p=8&l=as4&m=amazon&f=ifr&ref=as_ss_li_til&asins=B0BKK2ML4R&linkId=d213e7598e24e2e20fe2a88a33a4956d"></iframe>
-    <iframe sandbox="allow-popups allow-scripts allow-modals allow-forms allow-same-origin" style="width:120px;height:240px;" marginwidth="0" marginheight="0" scrolling="no" frameborder="0" src="//rcm-fe.amazon-adsystem.com/e/cm?lt1=_blank&bc1=FFFFFF&IS2=1&bg1=FFFFFF&fc1=000000&lc1=0000FF&t=bombshell034-22&language=ja_JP&o=9&p=8&l=as4&m=amazon&f=ifr&ref=as_ss_li_til&asins=B09V5QWWNJ&linkId=b14b71a852e8d60e1c178528a84eca1d"></iframe>
-    <iframe sandbox="allow-popups allow-scripts allow-modals allow-forms allow-same-origin" style="width:120px;height:240px;" marginwidth="0" marginheight="0" scrolling="no" frameborder="0" src="//rcm-fe.amazon-adsystem.com/e/cm?lt1=_blank&bc1=FFFFFF&IS2=1&bg1=FFFFFF&fc1=000000&lc1=0000FF&t=bombshell034-22&language=ja_JP&o=9&p=8&l=as4&m=amazon&f=ifr&ref=as_ss_li_til&asins=B07Y8G269R&linkId=bd68aca4898ba16f53a37ade3daa8412"></iframe>
-    <iframe sandbox="allow-popups allow-scripts allow-modals allow-forms allow-same-origin" style="width:120px;height:240px;" marginwidth="0" marginheight="0" scrolling="no" frameborder="0" src="//rcm-fe.amazon-adsystem.com/e/cm?lt1=_blank&bc1=000000&IS2=1&bg1=FFFFFF&fc1=000000&lc1=0000FF&t=bombshell034-22&language=ja_JP&o=9&p=8&l=as4&m=amazon&f=ifr&ref=as_ss_li_til&asins=B0BHWJZNHP&linkId=222cceafb53221b44c0dfa38c80e1169"></iframe> -->
+  <noscript>JavaScriptが無効になっています。テンポくんを利用するにはJavaScriptを有効にしてください。</noscript>
+  <div class="container">
+    <!-- トップバー（言語切替左寄せ、お問い合わせ右寄せ） -->
+    <nav id="topbar" class="small">
+      <div id="lang_choice">
+        language:
+        <button id="lang_jp_btn" class="active">日本語</button>
+        <button id="lang_en_btn">English</button>
+      </div>
+      <div id="contact_link">
+        <a
+          href="https://docs.google.com/forms/d/e/1FAIpQLSf0bi78D6XIxtSpo8U2mfEhfWpcOxBuyU3Fg17WkV3pqp7Y3A/viewform?usp=sf_link">Contact</a>
+      </div>
+    </nav>
 
+    <!-- ヘッダー -->
+    <header>
+      <h1>
+        <span class="lang-ja">わかりまテンポくん</span>
+        <span class="lang-en" style="display:none;">Tempo-kun</span>
+      </h1>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <main>
+      <!-- 説明文 -->
+      <section id="desc">
+        <div class="lang-ja">
+          曲に合わせてタップしてテンポを測れます。<br>
+          全タップの平均BPMを算出します。<br>
+          リズム感がなくてもたくさんタップすると正確な値になります。<br><br>
+          [Space]: タップ [C]: リセット
+        </div>
+        <div class="lang-en" style="display:none;">
+          Tap along with the music to measure BPM.<br>
+          It calculates the average BPM from all your taps.<br>
+          Even without a sense of rhythm, frequent tapping yields accurate results.<br><br>
+          [Space]: Tap [C]: Reset
+        </div>
+      </section>
+
+      <!-- BPM表示エリア -->
+      <section id="display">
+        <div id="bpm-wrap" class="border border-primary rounded">
+          <div id="bpm">
+            <span class="label lang-ja">BPM = </span>
+            <span class="label lang-en" style="display:none;">BPM = </span>
+            <span id="bpm-text" class="d-inline-block"></span>
+          </div>
+          <div id="count">
+            ( <span class="label lang-ja">カウント: </span>
+            <span class="label lang-en" style="display:none;">Count: </span>
+            <span id="count-txt" class="d-inline-block"></span> )
+          </div>
+        </div>
+      </section>
+
+      <!-- ボタン -->
+      <section id="controls" class="row">
+        <div class="col-8">
+          <button id="tap" class="control btn btn-primary">TAP</button>
+        </div>
+        <div class="col-4">
+          <button id="reset" class="control btn btn-outline-danger">C</button>
+        </div>
+      </section>
+
+      <!-- ログ表示 -->
+      <section id="logs"></section>
+
+      <!-- 履歴 -->
+      <section id="history">
+        <p>--HISTORY--</p>
+        <p>2025.04.06: なんとなくデザイン変更</p>
+        <p>2022.05.06: トラックパットだと難しいためキーボード入力に対応</p>
+        <p>2019.04.10: リリース</p>
+      </section>
+
+      <!-- 広告 -->
+      <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1162815414473198"
+        crossorigin="anonymous"></script>
+      <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-1162815414473198" data-ad-slot="4879657166"
+        data-ad-format="auto" data-full-width-responsive="true"></ins>
+      <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      </script>
+    </main>
   </div>
-  <style>
-    div#iten{
-      background-color: #ffe3e3;
-      color: red;
-      border-color: red;
-      border: solid;
-      padding: 1em;
+
+  <!-- JavaScript：多言語切替＆BPM計測 -->
+  <script type="text/javascript">
+    // 言語切替処理
+    function toggleLanguage(lang) {
+      const jaElements = document.querySelectorAll('.lang-ja');
+      const enElements = document.querySelectorAll('.lang-en');
+
+      if (lang === 'en') {
+        jaElements.forEach(el => el.style.display = 'none');
+        enElements.forEach(el => el.style.display = 'inline-block');
+        document.documentElement.lang = 'en';
+        document.getElementById('lang_en_btn').classList.add('active');
+        document.getElementById('lang_jp_btn').classList.remove('active');
+      } else {
+        jaElements.forEach(el => el.style.display = 'inline-block');
+        enElements.forEach(el => el.style.display = 'none');
+        document.documentElement.lang = 'ja';
+        document.getElementById('lang_jp_btn').classList.add('active');
+        document.getElementById('lang_en_btn').classList.remove('active');
+      }
     }
-  </style>
-  <script type="text/javascript" src="src/script.js"></script>
+
+    // 言語ボタンのイベントリスナー
+    document.getElementById('lang_jp_btn').addEventListener('click', () => {
+      toggleLanguage('ja');
+    });
+    document.getElementById('lang_en_btn').addEventListener('click', () => {
+      toggleLanguage('en');
+    });
+
+    // BPM計測ロジック
+    let curTapTime = null;
+    let preTapTime = null;
+    let isFirstTap = true;
+    let logMessage = '';
+    let bpm = null;
+    let bpms = [];
+    let aveBpm = null;
+
+    const bpmText = document.getElementById('bpm-text');
+    const countText = document.getElementById('count-txt');
+    const logsEl = document.getElementById('logs');
+    const tapButton = document.getElementById('tap');
+    const resetButton = document.getElementById('reset');
+
+    const average = (arr) => arr.reduce((sum, value) => sum + value, 0) / arr.length;
+
+    const handleTap = (e) => {
+      e.preventDefault();
+      curTapTime = performance.now() / 1000;
+
+      if (isFirstTap) {
+        aveBpm = 0;
+        logMessage = '### START ###';
+        preTapTime = curTapTime;
+        isFirstTap = false;
+      } else {
+        const interval = curTapTime - preTapTime;
+        if (interval > 0) {
+          bpm = 60 / interval;
+          bpms.push(bpm);
+          aveBpm = average(bpms);
+          logMessage = `BPM = ${bpm.toFixed(10)}, interval = ${interval.toFixed(10)}`;
+          preTapTime = curTapTime;
+        }
+      }
+
+      bpmText.textContent = (aveBpm ? aveBpm.toFixed(1) : '###');
+      countText.textContent = (bpms.length > 0 ? bpms.length : '###');
+      const newLog = document.createElement('div');
+      newLog.textContent = logMessage;
+      logsEl.insertBefore(newLog, logsEl.firstChild);
+    };
+
+    const reset = () => {
+      curTapTime = null;
+      preTapTime = null;
+      isFirstTap = true;
+      logMessage = '';
+      bpm = null;
+      bpms = [];
+      aveBpm = null;
+
+      bpmText.textContent = '###';
+      countText.textContent = '###';
+      logsEl.textContent = '';
+    };
+
+    const handleKeyPress = (e) => {
+      if (e.key === ' ' || e.key === 'Enter') {
+        handleTap(e);
+      }
+      if (['c', 'r'].includes(e.key.toLowerCase()) || e.key === 'Escape' || e.key === 'Backspace') {
+        reset();
+      }
+    };
+
+    tapButton.addEventListener('click', handleTap);
+    resetButton.addEventListener('click', reset);
+    document.addEventListener('keydown', handleKeyPress);
+  </script>
 </body>
 
 </html>
