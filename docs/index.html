@@ -273,7 +273,7 @@
       }
 
       // 表示の更新（初回はBPM非表示）
-      bpmText.textContent = (tapCount > 1 ? bpm.toFixed(1) : '###');
+      bpmText.textContent = (tapCount > 1 ? bpm.toFixed(2) : '###');
       countText.textContent = tapCount;
 
       // ログに記録
