@@ -13,7 +13,6 @@
   <meta name="description" content="リズムに合わせてタップするだけで正確にBPM（テンポ）を測定します。">
   <meta name="copyright" content="Copyright &copy; わかりまテンポくん All right reserved.">
   <link rel="canonical" href="https://bpm.somakawa.com">
-  <!-- （その他のメタ情報・リンクはそのまま） -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
     crossorigin="anonymous">
   <style>
@@ -74,6 +73,10 @@
     .label {
       display: inline-block;
       min-width: 80px;
+    }
+
+    .fraction {
+      font-size: 0.6em;
     }
 
     button.control {
@@ -214,7 +217,6 @@
         <p>2022.05.06: トラックパッドだとクリックが難しいためキー入力対応</p>
         <p>2019.04.10: リリース</p>
       </section>
-      <!-- 広告等はそのまま -->
     </main>
   </div>
   <script type="text/javascript">
@@ -273,7 +275,14 @@
       }
 
       // 表示の更新（初回はBPM非表示）
-      bpmText.textContent = (tapCount > 1 ? bpm.toFixed(2) : '###');
+      if (tapCount > 1) {
+        // bpm.toFixed(2) の結果を整数部と小数部に分ける
+        const formatted = bpm.toFixed(2);
+        const parts = formatted.split('.');
+        bpmText.innerHTML = parts[0] + '<span class="fraction">.' + parts[1] + '</span>';
+      } else {
+        bpmText.textContent = '###';
+      }
       countText.textContent = tapCount;
 
       // ログに記録
