@@ -24,15 +24,6 @@
   </style>
   <!-- Cross-Origin Isolation via Service Worker -->
   <script src="/coi-serviceworker.min.js" scope="."></script>
-
-  <!-- Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-138085015-1"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag() { dataLayer.push(arguments); }
-    gtag('js', new Date());
-    gtag('config', 'UA-138085015-1');
-  </script>
 </head>
 
 <body>
@@ -105,7 +96,6 @@
         const now = performance.now();
         count++;
 
-        // Initialize on first tap
         if (count === 1) {
           firstTime = prevTime = now;
           firstDate = new Date();
@@ -119,13 +109,9 @@
         const avgHz = avgBPM / 60;
         prevTime = now;
 
-        // Update display
         countDisplay.textContent = count;
-        if (count > 1) {
-          bpmDisplay.textContent = format(avgBPM, 2);
-        }
+        if (count > 1) bpmDisplay.textContent = format(avgBPM, 2);
 
-        // Add row to log
         const row = document.createElement('tr');
         addCell(row, count);
         addCell(row, format(now, 3));
@@ -146,7 +132,7 @@
         logBody.innerHTML = '';
       }
 
-      // Export log as CSV with timestamped filename
+      // Export log as CSV with timestamped filename including seconds
       function onDownload() {
         const lines = [];
         const headers = Array.from(document.querySelectorAll('#log-table thead th'))
@@ -161,7 +147,6 @@
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        // Use firstDate for filename or fallback to generic
         let filename = 'tap_log.csv';
         if (firstDate) {
           const yy = String(firstDate.getFullYear()).slice(-2);
@@ -169,6 +154,7 @@
           const dd = pad(firstDate.getDate());
           const hh = pad(firstDate.getHours());
           const mi = pad(firstDate.getMinutes());
+          const ss = pad(firstDate.getSeconds());
           filename = `tap_log_${yy}${mm}${dd}_${hh}${mi}${ss}.csv`;
         }
         a.download = filename;
@@ -181,7 +167,6 @@
         root.classList.toggle('hide-results', hideCheckbox.checked);
       });
 
-      // Event listeners
       tapBtn.addEventListener('click', onTap);
       resetBtn.addEventListener('click', onReset);
       downloadBtn.addEventListener('click', onDownload);
