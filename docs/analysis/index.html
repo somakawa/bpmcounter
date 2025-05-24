@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tempo-kun for Analysis | BPM Measurement Tool</title>
+  <meta name="description" content="Calculate BPM from your taps and display logs in a table format.">
+  <!-- Google Font: Inconsolata -->
+  <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* Use Inconsolata monospaced font */
+    body {
+      font-family: 'Inconsolata', monospace;
+      margin: 20px;
+    }
+
+    /* Hide measurement results when toggled */
+    .hide-results #bpm-display,
+    .hide-results #log-table th:not(:first-child),
+    .hide-results #log-table td:not(:first-child) {
+      color: white !important;
+    }
+  </style>
+  <!-- Cross-Origin Isolation via Service Worker -->
+  <script src="/coi-serviceworker.min.js" scope="."></script>
+
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-138085015-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'UA-138085015-1');
+  </script>
+</head>
+
+<body>
+  <noscript>Please enable JavaScript to use this tool.</noscript>
+
+  <h1>Tempo-kun for Analysis</h1>
+  <p>Calculates BPM based on your tap intervals.</p>
+  <p>Press <strong>Space</strong> to tap, <strong>Esc</strong> to reset.</p>
+
+  <p><strong>BPM:</strong> <span id="bpm-display">###</span></p>
+  <p><strong>Count:</strong> <span id="count-display">###</span></p>
+
+  <button id="tap-btn">Tap</button>
+  <button id="reset-btn">Reset</button>
+  <button id="download-btn">Download CSV</button>
+
+  <!-- Toggle to hide measurement columns -->
+  <label><input type="checkbox" id="hide-checkbox"> Hide results</label>
+
+  <h2>Tap Log</h2>
+  <table id="log-table" border="1" cellpadding="4">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Time (ms)</th>
+        <th>ΔTime (ms)</th>
+        <th>Instant BPM</th>
+        <th>Average BPM</th>
+        <th>Instant Hz</th>
+        <th>Average Hz</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    (function () {
+      const bpmDisplay = document.getElementById('bpm-display');
+      const countDisplay = document.getElementById('count-display');
+      const logBody = document.querySelector('#log-table tbody');
+      const tapBtn = document.getElementById('tap-btn');
+      const resetBtn = document.getElementById('reset-btn');
+      const downloadBtn = document.getElementById('download-btn');
+      const hideCheckbox = document.getElementById('hide-checkbox');
+      const root = document.body;
+
+      let firstTime = 0;
+      let prevTime = 0;
+      let count = 0;
+      let firstDate = null;
+
+      // Format number to fixed decimals
+      function format(value, decimals = 10) {
+        return value.toFixed(decimals);
+      }
+      // Zero-pad numbers
+      function pad(num) {
+        return num < 10 ? '0' + num : String(num);
+      }
+
+      // Append a cell with text to a row
+      function addCell(row, text) {
+        const cell = document.createElement('td');
+        cell.textContent = text;
+        row.appendChild(cell);
+      }
+
+      // Handle tap event: record timings and calculate metrics
+      function onTap() {
+        const now = performance.now();
+        count++;
+
+        // Initialize on first tap
+        if (count === 1) {
+          firstTime = prevTime = now;
+          firstDate = new Date();
+        }
+
+        const delta = now - prevTime;
+        const duration = now - firstTime;
+        const instantBPM = count > 1 ? 60000 / delta : 0;
+        const avgBPM = count > 1 ? 60000 * (count - 1) / duration : 0;
+        const instantHz = instantBPM / 60;
+        const avgHz = avgBPM / 60;
+        prevTime = now;
+
+        // Update display
+        countDisplay.textContent = count;
+        if (count > 1) {
+          bpmDisplay.textContent = format(avgBPM, 2);
+        }
+
+        // Add row to log
+        const row = document.createElement('tr');
+        addCell(row, count);
+        addCell(row, format(now, 3));
+        addCell(row, format(delta, 3));
+        addCell(row, count === 1 ? '-' : format(instantBPM, 3));
+        addCell(row, count === 1 ? '-' : format(avgBPM, 3));
+        addCell(row, count === 1 ? '-' : format(instantHz, 6));
+        addCell(row, count === 1 ? '-' : format(avgHz, 6));
+        logBody.insertBefore(row, logBody.firstChild);
+      }
+
+      // Reset all data
+      function onReset() {
+        firstTime = prevTime = count = 0;
+        firstDate = null;
+        bpmDisplay.textContent = '###';
+        countDisplay.textContent = '###';
+        logBody.innerHTML = '';
+      }
+
+      // Export log as CSV with timestamped filename
+      function onDownload() {
+        const lines = [];
+        const headers = Array.from(document.querySelectorAll('#log-table thead th'))
+          .map(th => `"${th.textContent}"`);
+        lines.push(headers.join(','));
+        document.querySelectorAll('#log-table tbody tr').forEach(row => {
+          const values = Array.from(row.children).map(cell => `"${cell.textContent}"`);
+          lines.push(values.join(','));
+        });
+        const csvContent = lines.join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        // Use firstDate for filename or fallback to generic
+        let filename = 'tap_log.csv';
+        if (firstDate) {
+          const yy = String(firstDate.getFullYear()).slice(-2);
+          const mm = pad(firstDate.getMonth() + 1);
+          const dd = pad(firstDate.getDate());
+          const hh = pad(firstDate.getHours());
+          const mi = pad(firstDate.getMinutes());
+          filename = `tap_log_${yy}${mm}${dd}_${hh}${mi}.csv`;
+        }
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+
+      // Toggle hide/show of measurement columns
+      hideCheckbox.addEventListener('change', () => {
+        root.classList.toggle('hide-results', hideCheckbox.checked);
+      });
+
+      // Event listeners
+      tapBtn.addEventListener('click', onTap);
+      resetBtn.addEventListener('click', onReset);
+      downloadBtn.addEventListener('click', onDownload);
+      document.addEventListener('keydown', e => {
+        if (e.key === ' ') {
+          e.preventDefault();
+          onTap();
+        } else if (e.key === 'Escape') {
+          onReset();
+        }
+      });
+    })();
+  </script>
+</body>
+
+</html>
