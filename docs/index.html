@@ -62,144 +62,7 @@
     integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 
 
-  <style>
-    /* 基本フォント・レイアウト設定 */
-    body {
-      font-family: 'Roboto', sans-serif;
-      background: linear-gradient(135deg, #ece9e6, #ffffff);
-      color: #333;
-    }
-
-    html {
-      touch-action: manipulation;
-    }
-
-    .container {
-      background-color: #fff;
-      padding: 30px 40px;
-      max-width: 700px;
-      margin: 40px auto;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-
-    h1 {
-      font-size: 2rem;
-      font-weight: 700;
-      margin-top: 20px;
-      margin-bottom: 20px;
-      text-align: center;
-    }
-
-    #desc {
-      font-size: 1rem;
-      margin-bottom: 20px;
-      text-align: center;
-      line-height: 1.5;
-    }
-
-    #bpm-wrap {
-      background: linear-gradient(135deg, #f6f9fc, #e9eff5);
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 20px;
-      margin-bottom: 20px;
-      text-align: center;
-    }
-
-    #bpm {
-      font-size: 3rem;
-      font-weight: 700;
-      margin-bottom: 10px;
-    }
-
-    #bpm .label {
-      font-size: 1.5rem;
-    }
-
-    .label {
-      display: inline-block;
-      min-width: 80px;
-    }
-
-    .fraction {
-      font-size: 0.6em;
-    }
-
-    button.control {
-      height: 100px;
-      width: 100%;
-      font-size: 1.5rem;
-      transition: background-color 0.3s, transform 0.2s;
-    }
-
-    button.control:hover {
-      transform: translateY(-3px);
-    }
-
-    #topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-
-    #lang_choice {
-      text-align: left;
-    }
-
-    #lang_choice button {
-      margin-right: 5px;
-      border: none;
-      background: none;
-      cursor: pointer;
-      font-weight: 700;
-      font-size: 0.9rem;
-      color: #555;
-      transition: color 0.3s;
-    }
-
-    #lang_choice button:hover,
-    #lang_choice button.active {
-      color: #007bff;
-      text-decoration: underline;
-    }
-
-    #page_link {
-      text-align: right;
-    }
-
-    #page_link a {
-      margin-left: 5px;
-      font-weight: 700;
-      font-size: 0.9rem;
-      color: #555;
-      text-decoration: none;
-      transition: color 0.3s;
-    }
-
-    #page_link a:hover {
-      color: #007bff;
-      text-decoration: underline;
-    }
-
-    #logs {
-      margin: 20px 0;
-      max-height: 300px;
-      overflow-y: auto;
-      background-color: #f9f9f9;
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-    }
-
-    #history p {
-      margin: 0;
-      padding: 0;
-      font-size: 0.85rem;
-      color: #777;
-    }
-  </style>
+  <link rel="stylesheet" href="./src/main.css">
 
   <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=UA-138085015-1"></script>
@@ -237,12 +100,19 @@
       <section id="desc">
         <div class="lang-ja">
           曲に合わせてタップするだけで、正確にテンポ（BPM）を測定します。<br>
-          たくさんタップするほど、より正確な値が得られます。<br><br>
+          たくさんタップするほど、より正確な値が得られます。<br>
+          変化するBPMの測定には対応していません。<br>
+          回帰を用いた精度向上を行っているため、<br>
+          研究などの目的で生データが必要な場合は「<a href="./analysis/index.html">for Analysis</a>」をご利用ください。<br><br>
           [Space]: タップ　[C]: リセット
         </div>
         <div class="lang-en" style="display:none;">
           Tap along with the music to measure BPM accurately.<br>
-          More taps yield more precise results.<br><br>
+          More taps yield more precise results.<br>
+          This tool focuses on high-precision measurement of a single steady BPM.<br>
+          It does not support changing tempos.<br>
+          Accuracy is enhanced with regression,<br>
+          so use "<a href="./analysis/index.html">for Analysis</a>" if you need raw data for research.<br><br>
           [Space]: Tap [C]: Reset
         </div>
       </section>
@@ -278,101 +148,7 @@
       </section>
     </main>
   </div>
-  <script type="text/javascript">
-    // 言語切替処理
-    function toggleLanguage(lang) {
-      const jaElements = document.querySelectorAll('.lang-ja');
-      const enElements = document.querySelectorAll('.lang-en');
-      if (lang === 'en') {
-        jaElements.forEach(el => el.style.display = 'none');
-        enElements.forEach(el => el.style.display = 'inline-block');
-        document.documentElement.lang = 'en';
-        document.getElementById('lang_en_btn').classList.add('active');
-        document.getElementById('lang_jp_btn').classList.remove('active');
-      } else {
-        jaElements.forEach(el => el.style.display = 'inline-block');
-        enElements.forEach(el => el.style.display = 'none');
-        document.documentElement.lang = 'ja';
-        document.getElementById('lang_jp_btn').classList.add('active');
-        document.getElementById('lang_en_btn').classList.remove('active');
-      }
-    }
-    document.getElementById('lang_jp_btn').addEventListener('click', () => {
-      toggleLanguage('ja');
-    });
-    document.getElementById('lang_en_btn').addEventListener('click', () => {
-      toggleLanguage('en');
-    });
-
-    // BPM測定アルゴリズム
-    let firstTapTime = null;
-    let tapCount = 0;
-    let bpm = null;
-    let logMessage = '';
-
-    const bpmText = document.getElementById('bpm-text');
-    const countText = document.getElementById('count-txt');
-    const logsEl = document.getElementById('logs');
-    const tapButton = document.getElementById('tap');
-    const resetButton = document.getElementById('reset');
-
-    const handleTap = (e) => {
-      e.preventDefault();
-      const curTapTime = performance.now() / 1000; // 現在時刻（秒単位）を取得
-      tapCount++;
-
-      if (tapCount === 1) {
-        // 初回タップ: 基準時刻を記録
-        firstTapTime = curTapTime;
-        bpm = 0;
-        logMessage = '### START ###';
-      } else {
-        // 2回目以降: 最初のタップからの経過時間でBPMを算出
-        const totalInterval = curTapTime - firstTapTime;
-        bpm = 60 * (tapCount - 1) / totalInterval;
-        logMessage = `BPM = ${bpm.toFixed(10)}, total time = ${totalInterval.toFixed(10)}`;
-      }
-
-      // 表示の更新（初回はBPM非表示）
-      if (tapCount > 1) {
-        // bpm.toFixed(2) の結果を整数部と小数部に分ける
-        const formatted = bpm.toFixed(2);
-        const parts = formatted.split('.');
-        bpmText.innerHTML = parts[0] + '<span class="fraction">.' + parts[1] + '</span>';
-      } else {
-        bpmText.textContent = '###';
-      }
-      countText.textContent = tapCount;
-
-      // ログに記録
-      const newLog = document.createElement('div');
-      newLog.textContent = logMessage;
-      logsEl.insertBefore(newLog, logsEl.firstChild);
-    };
-
-    const reset = () => {
-      firstTapTime = null;
-      tapCount = 0;
-      bpm = null;
-      logMessage = '';
-      bpmText.textContent = '###';
-      countText.textContent = '###';
-      logsEl.textContent = '';
-    };
-
-    const handleKeyPress = (e) => {
-      if (e.key === ' ' || e.key === 'Enter') {
-        handleTap(e);
-      }
-      if (['c', 'r'].includes(e.key.toLowerCase()) || e.key === 'Escape' || e.key === 'Backspace') {
-        reset();
-      }
-    };
-
-    tapButton.addEventListener('click', handleTap);
-    resetButton.addEventListener('click', reset);
-    document.addEventListener('keydown', handleKeyPress);
-  </script>
+  <script type="text/javascript" src="./src/main.js"></script>
 </body>
 
 </html>

@@ -1,19 +1,38 @@
 (() => {
+  const jaElements = document.querySelectorAll('.lang-ja');
+  const enElements = document.querySelectorAll('.lang-en');
+  const langJpButton = document.getElementById('lang_jp_btn');
+  const langEnButton = document.getElementById('lang_en_btn');
+
   const bpmText = document.getElementById('bpm-text');
   const countText = document.getElementById('count-txt');
-  const logs = document.getElementById('logs');
+  const logsEl = document.getElementById('logs');
   const tapButton = document.getElementById('tap');
   const resetButton = document.getElementById('reset');
 
-  let currentTapTime = NaN;
-  let isFirstTap = true;
-  let logMessage = '';
+  let firstTapTime = null;
+  let tapCount = 0;
   let bpm = null;
+  let logMessage = '';
   const tapTimes = [];
   const MIN_TAPS_FOR_ESTIMATE = 8;
   const MAX_INTERVAL_MS = 2000;
   const MIN_INTERVAL_MS = 150;
   const MAX_WINDOW = 64;
+
+  const setLanguage = (lang) => {
+    const isEnglish = lang === 'en';
+    jaElements.forEach((el) => { el.style.display = isEnglish ? 'none' : 'inline-block'; });
+    enElements.forEach((el) => { el.style.display = isEnglish ? 'inline-block' : 'none'; });
+    document.documentElement.lang = isEnglish ? 'en' : 'ja';
+    langEnButton.classList.toggle('active', isEnglish);
+    langJpButton.classList.toggle('active', !isEnglish);
+  };
+
+  const formatBpm = (value) => {
+    const [integer, fraction] = value.toFixed(2).split('.');
+    return `${integer}<span class="fraction">.${fraction}</span>`;
+  };
 
   const median = (values) => {
     if (!values.length) return 0;
@@ -90,72 +109,70 @@
     return 60 / slope;
   };
 
-  const renderLogs = () => {
-    logs.innerHTML = `<div>${logMessage}</div>` + logs.innerHTML;
-  };
-
-  const renderDisplay = () => {
-    if (tapTimes.length > 1 && typeof bpm === 'number') {
-      bpmText.innerHTML = Math.round(bpm * 10) / 10;
-    } else {
-      bpmText.innerHTML = '###';
-    }
-    countText.innerHTML = tapTimes.length || '###';
-  };
-
-  const tap = (event) => {
+  const handleTap = (event) => {
     event.preventDefault();
-    currentTapTime = performance.now() / 1000;
+    const curTapTime = performance.now() / 1000;
     const lastTap = tapTimes[tapTimes.length - 1];
     if (lastTap) {
-      const intervalMs = (currentTapTime - lastTap) * 1000;
+      const intervalMs = (curTapTime - lastTap) * 1000;
       if (intervalMs < MIN_INTERVAL_MS || intervalMs > MAX_INTERVAL_MS) {
         logMessage = 'Ignored tap (interval out of range)';
-        renderLogs();
+        logsEl.insertBefore(Object.assign(document.createElement('div'), { textContent: logMessage }), logsEl.firstChild);
         return;
       }
     }
 
-    tapTimes.push(currentTapTime);
+    tapCount += 1;
+    tapTimes.push(curTapTime);
 
-    if (isFirstTap) {
+    if (tapCount === 1) {
+      firstTapTime = curTapTime;
+      bpm = 0;
       logMessage = '### START ###';
-      isFirstTap = false;
     } else {
       bpm = computeBpm();
-      const provisional = tapTimes.length < MIN_TAPS_FOR_ESTIMATE ? ' (provisional)' : '';
-      logMessage = `BPM = ${bpm != null ? bpm : 'NaN'}${provisional}`;
+      const totalInterval = curTapTime - firstTapTime;
+      const bpmText = bpm ? bpm.toFixed(10) : 'NaN';
+      const provisional = tapCount < MIN_TAPS_FOR_ESTIMATE ? ' (provisional)' : '';
+      logMessage = `BPM = ${bpmText}${provisional}, total time = ${totalInterval.toFixed(10)}`;
     }
 
-    renderDisplay();
-    renderLogs();
-    event.stopPropagation();
+    if (tapCount > 1 && bpm) {
+      bpmText.innerHTML = formatBpm(bpm);
+    } else {
+      bpmText.textContent = '###';
+    }
+    countText.textContent = tapCount;
+
+    const newLog = document.createElement('div');
+    newLog.textContent = logMessage;
+    logsEl.insertBefore(newLog, logsEl.firstChild);
   };
 
   const reset = () => {
-    currentTapTime = NaN;
-    isFirstTap = true;
-    logMessage = '';
+    firstTapTime = null;
+    tapCount = 0;
     bpm = null;
+    logMessage = '';
     tapTimes.length = 0;
-
-    bpmText.innerHTML = '###';
-    countText.innerHTML = '###';
-    logs.innerHTML = '';
+    bpmText.textContent = '###';
+    countText.textContent = '###';
+    logsEl.textContent = '';
   };
 
   const handleKeyPress = (event) => {
-    const code = event.keyCode;
-    if (code === 32 || code === 13) {
-      tap(event);
+    const key = event.key.toLowerCase();
+    if (event.key === ' ' || event.key === 'Enter') {
+      handleTap(event);
     }
-    if ([67, 82, 27, 8].includes(code)) {
+    if (key === 'c' || key === 'r' || event.key === 'Escape' || event.key === 'Backspace') {
       reset();
     }
   };
 
-  reset();
-  tapButton.addEventListener('click', tap);
+  langJpButton.addEventListener('click', () => setLanguage('ja'));
+  langEnButton.addEventListener('click', () => setLanguage('en'));
+  tapButton.addEventListener('click', handleTap);
   resetButton.addEventListener('click', reset);
   document.addEventListener('keydown', handleKeyPress);
 })();
