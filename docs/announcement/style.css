@@ -17,6 +17,12 @@
   margin-top: 3rem;
 }
 
+.announcement-lead-divider {
+  margin-top: 1.5rem;
+  margin-bottom: 0;
+  color: #999;
+}
+
 .announcement-lead-signature {
   margin-top: 2rem;
   text-align: right;
