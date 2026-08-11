@@ -140,3 +140,44 @@ button.control:hover {
     line-height: 1.4;
   }
 }
+
+#work-ad {
+  margin-top: 30px;
+  padding: 20px 10px 10px;
+  border-top: 1px solid #ddd;
+  text-align: center;
+}
+
+#work-ad h2 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+#work-ad p {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin: 8px 0;
+}
+
+.work-ad-scope {
+  font-weight: 700;
+}
+
+.work-ad-button {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 8px 24px;
+  border-radius: 4px;
+  background-color: #007bff;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.9rem;
+  transition: background-color 0.3s;
+}
+
+.work-ad-button:hover {
+  background-color: #0056b3;
+  color: #fff;
+}
