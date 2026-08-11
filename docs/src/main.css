@@ -135,9 +135,21 @@ button.control:hover {
 }
 
 @media (max-width: 576px) {
+  .container {
+    margin: 0 auto;
+  }
+
   #desc {
     font-size: 0.9rem;
     line-height: 1.4;
+  }
+
+  #work-ad h2 {
+    font-size: 1rem;
+  }
+
+  #work-ad p {
+    font-size: 0.85rem;
   }
 }
 
